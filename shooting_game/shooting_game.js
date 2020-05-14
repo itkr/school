@@ -56,17 +56,22 @@ class Shot extends Obj {
 class Machine extends Obj {
     makeObject() {
         this.context.fillStyle = 'rgb(255,00,00)';
-        this.context.fillRect(this.x - 10 , this.y - 10 , 20, 20);
+        this.context.beginPath();
+        this.context.moveTo(this.x, this.y - 20);
+        this.context.lineTo(this.x - 20, this.y + 10);
+        this.context.lineTo(this.x + 20, this.y + 10);
+        this.context.lineTo(this.x, this.y - 20);
+        this.context.closePath();
+        this.context.fill();
     }
     shot() {
-        // TODO: childrenじゃなくてフィールドクラスに入れる
-        this.children.push(new Shot(this.context, this.x, this.y));
+        field.push(new Shot(this.context, this.x, this.y));
     }
 }
 
 class Field extends Obj {
     makeObject() {
-        context.clearRect(0, 0, canvas.width, canvas.height);
+        this.context.clearRect(0, 0, canvas.width, canvas.height);
     }
 }
 
@@ -88,14 +93,19 @@ function main() {
     requestAnimationFrame(main);
 }
 
-// 初期化
-if (!canvas.getContext) {
-    aleart('未対応');
+function init() {
+    // 初期化
+    if (!canvas.getContext) {
+        aleart('未対応');
+    }
+    context = canvas.getContext('2d');
+    field = new Field(context);
+    machine = new Machine(context, 10, 10);
+    field.push(machine);
+    field.push(new Enemy(context));
+    canvas.addEventListener('mousemove', onMouseMove, false);
+    canvas.addEventListener('click', onMouseClick, false);
+    requestAnimationFrame(main);
 }
-context = canvas.getContext('2d');
-field = new Field(context);
-machine = new Machine(context, 10, 10);
-field.push(machine);
-canvas.addEventListener('mousemove', onMouseMove, false);
-canvas.addEventListener('click', onMouseClick, false);
-requestAnimationFrame(main);
+
+init();
