@@ -17,9 +17,24 @@ class Obj {
     push(obj) {
         this.children.push(obj);
     }
+    pointIsIn(x, y) {
+        // 与えられたポイントがこのオブジェクト内に入っているか
+    }
+    checkCollision() {
+        let collisions = [];
+        for (let child of this.children) {
+            // TODO: 衝突判定
+            if (false) {
+                collisions.push(child);
+            }
+        }
+        return collisions;
+    }
     moveTo(x=null, y=null) {
+        let collisions = [];
         this.x = x !== null? x: this.x;
         this.y = y !== null? y: this.y;
+        return this.checkCollision();
     }
     makeObject() {
     }
@@ -46,7 +61,7 @@ class Shot extends Obj {
         this.context.fillRect(this.x - 5 , this.y - 5 , 10, 10);
     }
     preDraw() {
-        this.y -= 20;
+        this.moveTo(null, this.y - 20);
         if (this.y < 0 || this.x < 0 || this.context.width < this.x || this.height < this.y) {
             this.disable();
         }
@@ -102,7 +117,6 @@ function init() {
     field = new Field(context);
     machine = new Machine(context, 10, 10);
     field.push(machine);
-    field.push(new Enemy(context));
     canvas.addEventListener('mousemove', onMouseMove, false);
     canvas.addEventListener('click', onMouseClick, false);
     requestAnimationFrame(main);
