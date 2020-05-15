@@ -106,6 +106,12 @@ class Machine extends Obj {
 }
 
 class Enemy extends Obj {
+    preDraw() {
+        let collisions = this.moveTo(
+            this.x + Math.random() * 10 - Math.random() * 10,
+            this.y + Math.random() * 5 - Math.random() * 5
+        );
+    }
     makeObject() {
         this.context.fillStyle = 'rgb(00,00,00)';
         this.context.fillRect(this.x - 10 , this.y - 10 , 20, 20);
@@ -145,10 +151,10 @@ function init() {
     field = new Field(context);
     machine = new Machine(context, 10, 10);
     field.push(machine);
-    field.push(new Enemy(context, 100, 100));
+    field.push(new Enemy(context, 200, 100));
     field.push(new Enemy(context, 550, 130));
     field.push(new Enemy(context, 603, 300));
-    field.push(new Enemy(context, 220, 200));
+    field.push(new Enemy(context, 720, 200));
     canvas.addEventListener('mousemove', onMouseMove, false);
     canvas.addEventListener('click', onMouseClick, false);
     requestAnimationFrame(main);
