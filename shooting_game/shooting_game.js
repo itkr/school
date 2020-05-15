@@ -19,13 +19,26 @@ class Obj {
     }
     pointIsIn(x, y) {
         // 与えられたポイントがこのオブジェクト内に入っているか
+        // TODO: 数学とか使う
+        // TODO: 大きさを可変に
+        if (this.x + 10 < x || x < this.x - 10) {
+            return false;
+        }
+        if (this.y + 10 < y || y < this.y - 10) {
+            return false;
+        }
+        return true;
     }
     checkCollision() {
         let collisions = [];
-        for (let child of this.children) {
-            // TODO: 衝突判定
-            if (false) {
+        for (let child of field.children) {
+            // 衝突判定
+            if (child === this) {
+                continue;
+            }
+            if (child.pointIsIn(this.x, this.y)) {
                 collisions.push(child);
+                console.log('collision');
             }
         }
         return collisions;
@@ -61,7 +74,13 @@ class Shot extends Obj {
         this.context.fillRect(this.x - 5 , this.y - 5 , 10, 10);
     }
     preDraw() {
-        this.moveTo(null, this.y - 20);
+        let collisions = this.moveTo(null, this.y - 20);
+        if (0 < collisions.length) {
+            this.disable();
+            for (let collision of collisions) {
+                collision.disable();
+            }
+        }
         if (this.y < 0 || this.x < 0 || this.context.width < this.x || this.height < this.y) {
             this.disable();
         }
@@ -81,6 +100,13 @@ class Machine extends Obj {
     }
     shot() {
         field.push(new Shot(this.context, this.x, this.y));
+    }
+}
+
+class Enemy extends Obj {
+    makeObject() {
+        this.context.fillStyle = 'rgb(00,00,00)';
+        this.context.fillRect(this.x - 10 , this.y - 10 , 20, 20);
     }
 }
 
@@ -117,6 +143,10 @@ function init() {
     field = new Field(context);
     machine = new Machine(context, 10, 10);
     field.push(machine);
+    field.push(new Enemy(context, 100, 100));
+    field.push(new Enemy(context, 550, 130));
+    field.push(new Enemy(context, 603, 300));
+    field.push(new Enemy(context, 220, 200));
     canvas.addEventListener('mousemove', onMouseMove, false);
     canvas.addEventListener('click', onMouseClick, false);
     requestAnimationFrame(main);
