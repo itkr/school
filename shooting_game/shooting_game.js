@@ -90,11 +90,13 @@ class Shot extends Obj {
 class Machine extends Obj {
     makeObject() {
         this.context.fillStyle = 'rgb(255,00,00)';
+        const INSCRIBED_CIRCLE = 0.298;
+        const CIRCUMCIRCLE = 0.577;
+        let edge = 50;
         this.context.beginPath();
-        this.context.moveTo(this.x, this.y - 20);
-        this.context.lineTo(this.x - 20, this.y + 10);
-        this.context.lineTo(this.x + 20, this.y + 10);
-        this.context.lineTo(this.x, this.y - 20);
+        this.context.moveTo(this.x, this.y - (edge * CIRCUMCIRCLE));
+        this.context.lineTo(this.x + (edge / 2), this.y + (edge * INSCRIBED_CIRCLE));
+        this.context.lineTo(this.x - (edge / 2), this.y + (edge * INSCRIBED_CIRCLE));
         this.context.closePath();
         this.context.fill();
     }
