@@ -1,11 +1,14 @@
 // グローバル変数
 // TODO: gameオブジェクトを作る
 let canvas = document.getElementById('shooting_game');
+let context = null;
+
 let mouseX = 0;
 let mouseY = 0;
-let context = null;
+
 let field = null;
 let machine = null;
+
 let score = 0;
 
 
@@ -65,10 +68,7 @@ class Obj {
 
 class Shot extends Obj {
     makeObject() {
-        this.context.fillStyle = 'rgb(00,00,255)';
-        this.context.beginPath();
-        this.context.arc(this.x, this.y, 5, 0 * Math.PI / 180, 360 * Math.PI / 180, false);
-        this.context.fill();
+        drawCircle(this.context, this.x, this.y, 5, 'rgb(0, 0, 255)');
     }
     preDraw() {
         let collisions = this.moveTo(null, this.y - 15);
@@ -90,16 +90,7 @@ class Shot extends Obj {
 
 class Machine extends Obj {
     makeObject() {
-        this.context.fillStyle = 'rgb(255,00,00)';
-        const INSCRIBED_CIRCLE = 0.298;
-        const CIRCUMCIRCLE = 0.577;
-        let edge = 50;
-        this.context.beginPath();
-        this.context.moveTo(this.x, this.y - (edge * CIRCUMCIRCLE));
-        this.context.lineTo(this.x + (edge / 2), this.y + (edge * INSCRIBED_CIRCLE));
-        this.context.lineTo(this.x - (edge / 2), this.y + (edge * INSCRIBED_CIRCLE));
-        this.context.closePath();
-        this.context.fill();
+        drawTriangle(this.context, this.x, this.y, 50, 'rgb(255, 0, 0)')
     }
     preDraw() {
         this.moveTo(mouseX, mouseY);
@@ -110,6 +101,9 @@ class Machine extends Obj {
 }
 
 class Enemy extends Obj {
+    makeObject() {
+        drawRect(this.context, this.x, this.y, 20, 20, 'rgb(0, 0, 0)');
+    }
     preDraw() {
         let collisions = this.moveTo(
             this.x + Math.random() * 10 - Math.random() * 10,
@@ -124,16 +118,37 @@ class Enemy extends Obj {
             }
         }
     }
-    makeObject() {
-        this.context.fillStyle = 'rgb(00,00,00)';
-        this.context.fillRect(this.x - 10 , this.y - 10 , 20, 20);
-    }
 }
 
 class Field extends Obj {
     makeObject() {
         this.context.clearRect(0, 0, canvas.width, canvas.height);
     }
+}
+
+// 図形
+function drawTriangle(context, x=0, y=0, edge=50, fill='rgb(255, 0, 0)') {
+    const INSCRIBED_CIRCLE = 0.298;
+    const CIRCUMCIRCLE = 0.577;
+    context.fillStyle = fill;
+    context.beginPath();
+    context.moveTo(x, y - (edge * CIRCUMCIRCLE));
+    context.lineTo(x + (edge / 2), y + (edge * INSCRIBED_CIRCLE));
+    context.lineTo(x - (edge / 2), y + (edge * INSCRIBED_CIRCLE));
+    context.closePath();
+    context.fill();
+}
+
+function drawCircle(context, x=0, y=0, redius=5, fill='rgb(0, 0, 255)') {
+    context.fillStyle = fill;
+    context.beginPath();
+    context.arc(x, y, redius, 0 * Math.PI / 180, 360 * Math.PI / 180, false);
+    context.fill();
+}
+
+function drawRect(context, x=0, y=0, width=20, height=20, fill='rgb(0, 0, 0)') {
+    context.fillStyle = fill;
+    context.fillRect(x - width / 2 , y - width / 2 , width, height);
 }
 
 // イベント
