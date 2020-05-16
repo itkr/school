@@ -90,7 +90,7 @@ class Shot extends Obj {
 
 class Machine extends Obj {
     makeObject() {
-        drawTriangle(this.context, this.x, this.y, 50, 'rgb(255, 0, 0)')
+        drawTriangle(this.context, this.x, this.y, 30, 'rgb(255, 0, 0)')
     }
     preDraw() {
         this.moveTo(mouseX, mouseY);
@@ -127,7 +127,7 @@ class Field extends Obj {
 }
 
 // 図形
-function drawTriangle(context, x=0, y=0, edge=50, fill='rgb(255, 0, 0)') {
+function drawTriangle(context, x, y, edge, fill) {
     const INSCRIBED_CIRCLE = 0.298;
     const CIRCUMCIRCLE = 0.577;
     context.fillStyle = fill;
@@ -139,14 +139,14 @@ function drawTriangle(context, x=0, y=0, edge=50, fill='rgb(255, 0, 0)') {
     context.fill();
 }
 
-function drawCircle(context, x=0, y=0, redius=5, fill='rgb(0, 0, 255)') {
+function drawCircle(context, x, y, redius, fill) {
     context.fillStyle = fill;
     context.beginPath();
     context.arc(x, y, redius, 0 * Math.PI / 180, 360 * Math.PI / 180, false);
     context.fill();
 }
 
-function drawRect(context, x=0, y=0, width=20, height=20, fill='rgb(0, 0, 0)') {
+function drawRect(context, x, y, width, height, fill) {
     context.fillStyle = fill;
     context.fillRect(x - width / 2 , y - width / 2 , width, height);
 }
@@ -194,12 +194,12 @@ function init() {
 setInterval(function() {
     let min_x = 0;
     let min_y = 0;
-    let max_x = 800;
-    let max_y = 450
+    let max_x = canvas.width;
+    let max_y = canvas.height;
     let x = Math.floor(Math.random() * (max_x - min_x + 1) + min_x)
     let y = Math.floor(Math.random() * (max_y - min_y + 1) + min_y)
     field.appendChild(new Enemy(context, x, y));
-}, 300)
+}, 3000)
 
 
 init();
