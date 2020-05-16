@@ -1,5 +1,8 @@
 // グローバル変数
 // TODO: gameオブジェクトを作る
+// TODO: JSON読み込み
+// TODO: API呼び出し
+// TODO: 最高点など記録(session storage)
 let mouseX = 0;
 let mouseY = 0;
 
@@ -117,6 +120,30 @@ class Enemy extends Obj {
     }
 }
 
+class Bomb extends Obj {
+    makeObject() {
+        drawCircle(this.context, this.x, this.y, 10, 'rgb(255, 255, 255)', 'rgb(0, 0, 0)');
+    }
+    preDraw() {
+        let collisions = this.moveTo(this.x, this.y + 4);
+        for (let collision of collisions) {
+            if (collision instanceof Machine) {
+                this.disable();
+                for (let child of field.children) {
+                    if (child instanceof Enemy) {
+                        child.disable();
+                    }
+                }
+                score -= 10;
+                break;
+            }
+        }
+        if (this.y < 0 || this.x < 0 || this.context.width < this.x || this.height < this.y) {
+            this.disable();
+        }
+    }
+}
+
 class Field extends Obj {
     makeObject() {
         this.context.clearRect(0, 0, this.context.canvas.width, this.context.canvas.height);
@@ -136,11 +163,13 @@ function drawTriangle(context, x, y, edge, fill) {
     context.fill();
 }
 
-function drawCircle(context, x, y, redius, fill) {
+function drawCircle(context, x, y, redius, fill, stroke) {
     context.fillStyle = fill;
+    context.strokeStyle = stroke;
     context.beginPath();
     context.arc(x, y, redius, 0 * Math.PI / 180, 360 * Math.PI / 180, false);
     context.fill();
+    context.stroke();
 }
 
 function drawRect(context, x, y, width, height, fill) {
@@ -168,6 +197,31 @@ function main() {
     requestAnimationFrame(main);
 }
 
+// 敵を追加していく
+setInterval(function() {
+    if (machine === null) {
+        return;
+    }
+    let min_x = 0;
+    let min_y = 0;
+    let max_x = field.context.canvas.width;
+    let max_y = field.context.canvas.height;
+    let x = Math.floor(Math.random() * (max_x - min_x + 1) + min_x)
+    let y = Math.floor(Math.random() * (max_y - min_y + 1) + min_y)
+    field.appendChild(new Enemy(field.context, x, y));
+}, 300)
+
+// 敵を追加していく
+setInterval(function() {
+    if (machine === null) {
+        return;
+    }
+    let min_x = 0;
+    let max_x = field.context.canvas.width;
+    let x = Math.floor(Math.random() * (max_x - min_x + 1) + min_x)
+    field.appendChild(new Bomb(field.context, x, 0));
+}, 5000)
+
 // 初期化
 function init() {
     // Canvas取得
@@ -189,17 +243,6 @@ function init() {
     // ゲーム開始
     requestAnimationFrame(main);
 }
-
-// 敵を追加していく
-setInterval(function() {
-    let min_x = 0;
-    let min_y = 0;
-    let max_x = field.context.canvas.width;
-    let max_y = field.context.canvas.height;
-    let x = Math.floor(Math.random() * (max_x - min_x + 1) + min_x)
-    let y = Math.floor(Math.random() * (max_y - min_y + 1) + min_y)
-    field.appendChild(new Enemy(field.context, x, y));
-}, 3000)
 
 
 init();
