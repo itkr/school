@@ -1,10 +1,13 @@
 // グローバル変数
+// TODO: gameオブジェクトを作る
 let canvas = document.getElementById('shooting_game');
 let mouseX = 0;
 let mouseY = 0;
 let context = null;
 let field = null;
 let machine = null;
+let score = 0;
+
 
 class Obj {
     constructor(context, x=0, y=0) {
@@ -14,7 +17,7 @@ class Obj {
         this.children = [];
         this.enabled = true;
     }
-    push(obj) {
+    appendChild(obj) {
         this.children.push(obj);
     }
     pointIsIn(x, y) {
@@ -33,12 +36,8 @@ class Obj {
         let collisions = [];
         for (let child of field.children) {
             // 衝突判定
-            if (child === this) {
-                continue;
-            }
-            if (child.pointIsIn(this.x, this.y)) {
+            if (child !== this && child.pointIsIn(this.x, this.y)) {
                 collisions.push(child);
-                console.log('collision');
             }
         }
         return collisions;
@@ -49,22 +48,18 @@ class Obj {
         this.y = y !== null? y: this.y;
         return this.checkCollision();
     }
-    makeObject() {
-    }
     disable() {
         this.enabled = false;
     }
-    preDraw() {
-    }
+    makeObject() {}
+    preDraw() {}
     draw() {
         this.preDraw();
         this.makeObject();
-        for (let child of this.children) {
-            if (child.enabled) {
-                child.draw();
-            }
-        }
         this.children = this.children.filter(child => child.enabled);
+        for (let child of this.children) {
+            child.draw();
+        }
     }
 }
 
@@ -82,6 +77,7 @@ class Shot extends Obj {
             if (collision instanceof Enemy) {
                 collision.disable();
                 this.disable();
+                score++;
                 break;
             }
         }
@@ -106,10 +102,10 @@ class Machine extends Obj {
         this.context.fill();
     }
     preDraw() {
-        machine.moveTo(mouseX, mouseY);
+        this.moveTo(mouseX, mouseY);
     }
     shot() {
-        field.push(new Shot(this.context, this.x, this.y));
+        field.appendChild(new Shot(this.context, this.x, this.y));
     }
 }
 
@@ -119,6 +115,14 @@ class Enemy extends Obj {
             this.x + Math.random() * 10 - Math.random() * 10,
             this.y + Math.random() * 5 - Math.random() * 5
         );
+        for (let collision of collisions) {
+            if (collision instanceof Machine) {
+                collision.disable();
+                this.disable();
+                machine = null;
+                break;
+            }
+        }
     }
     makeObject() {
         this.context.fillStyle = 'rgb(00,00,00)';
@@ -140,30 +144,39 @@ function onMouseMove(e) {
 }
 
 function onMouseClick(e) {
-    machine.shot();
+    if (machine instanceof Machine){
+        machine.shot();
+    }
 }
 
 // メインループ
 function main() {
     field.draw();
+    context.fillText('score: ' + score, 10, 20)
     requestAnimationFrame(main);
 }
 
+// 初期化
 function init() {
-    // 初期化
+    // Canvas取得
     if (!canvas.getContext) {
         aleart('未対応');
     }
     context = canvas.getContext('2d');
-    field = new Field(context);
-    machine = new Machine(context, 10, 10);
-    field.push(machine);
-    field.push(new Enemy(context, 200, 100));
-    field.push(new Enemy(context, 550, 130));
-    field.push(new Enemy(context, 603, 300));
-    field.push(new Enemy(context, 720, 200));
+    // イベント設定
     canvas.addEventListener('mousemove', onMouseMove, false);
     canvas.addEventListener('click', onMouseClick, false);
+    // フィールド設置
+    field = new Field(context);
+    // 自機設置
+    machine = new Machine(context, 10, 10);
+    field.appendChild(machine);
+    // 敵設置
+    field.appendChild(new Enemy(context, 200, 100));
+    field.appendChild(new Enemy(context, 550, 130));
+    field.appendChild(new Enemy(context, 603, 300));
+    field.appendChild(new Enemy(context, 720, 200));
+    // ゲーム開始
     requestAnimationFrame(main);
 }
 
