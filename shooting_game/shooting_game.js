@@ -187,12 +187,19 @@ function init() {
     machine = new Machine(context, 10, 10);
     field.appendChild(machine);
     // 敵設置
-    field.appendChild(new Enemy(context, 200, 100));
-    field.appendChild(new Enemy(context, 550, 130));
-    field.appendChild(new Enemy(context, 603, 300));
-    field.appendChild(new Enemy(context, 720, 200));
     // ゲーム開始
     requestAnimationFrame(main);
 }
+
+setInterval(function() {
+    let min_x = 0;
+    let min_y = 0;
+    let max_x = 800;
+    let max_y = 450
+    let x = Math.floor(Math.random() * (max_x - min_x + 1) + min_x)
+    let y = Math.floor(Math.random() * (max_y - min_y + 1) + min_y)
+    field.appendChild(new Enemy(context, x, y));
+}, 300)
+
 
 init();
