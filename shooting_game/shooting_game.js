@@ -100,6 +100,9 @@ class Machine extends Obj {
         this.context.closePath();
         this.context.fill();
     }
+    preDraw() {
+        machine.moveTo(mouseX, mouseY);
+    }
     shot() {
         field.push(new Shot(this.context, this.x, this.y));
     }
@@ -138,7 +141,6 @@ function onMouseClick(e) {
 // メインループ
 function main() {
     field.draw();
-    machine.moveTo(mouseX, mouseY);
     requestAnimationFrame(main);
 }
 
