@@ -70,17 +70,22 @@ class Obj {
 
 class Shot extends Obj {
     makeObject() {
-        this.context.fillStyle = 'rgb(00,00,00)';
-        this.context.fillRect(this.x - 5 , this.y - 5 , 10, 10);
+        this.context.fillStyle = 'rgb(00,00,255)';
+        this.context.beginPath();
+        this.context.arc(this.x, this.y, 5, 0 * Math.PI / 180, 360 * Math.PI / 180, false);
+        this.context.fill();
     }
     preDraw() {
-        let collisions = this.moveTo(null, this.y - 20);
-        if (0 < collisions.length) {
-            this.disable();
-            for (let collision of collisions) {
+        let collisions = this.moveTo(null, this.y - 15);
+        // 敵にぶつかったら消す
+        for (let collision of collisions) {
+            if (collision instanceof Enemy) {
                 collision.disable();
+                this.disable();
+                break;
             }
         }
+        // フィールドから出たら無効にする
         if (this.y < 0 || this.x < 0 || this.context.width < this.x || this.height < this.y) {
             this.disable();
         }
