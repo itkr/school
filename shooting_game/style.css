@@ -7,3 +7,6 @@ canvas#shooting_game {
     border: 1px solid #000000;
     background-color: #ffffff;
 }
+h2, ul {
+    text-align: left;
+}
