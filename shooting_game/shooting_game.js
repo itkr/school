@@ -1,8 +1,5 @@
 // グローバル変数
 // TODO: gameオブジェクトを作る
-let canvas = document.getElementById('shooting_game');
-let context = null;
-
 let mouseX = 0;
 let mouseY = 0;
 
@@ -122,7 +119,7 @@ class Enemy extends Obj {
 
 class Field extends Obj {
     makeObject() {
-        this.context.clearRect(0, 0, canvas.width, canvas.height);
+        this.context.clearRect(0, 0, this.context.canvas.width, this.context.canvas.height);
     }
 }
 
@@ -167,17 +164,19 @@ function onMouseClick(e) {
 // メインループ
 function main() {
     field.draw();
-    context.fillText('score: ' + score, 10, 20)
+    field.context.fillText('score: ' + score, 10, 20)
     requestAnimationFrame(main);
 }
 
 // 初期化
 function init() {
     // Canvas取得
+    let canvas = document.getElementById('shooting_game');
     if (!canvas.getContext) {
         aleart('未対応');
+        return;
     }
-    context = canvas.getContext('2d');
+    let context = canvas.getContext('2d');
     // イベント設定
     canvas.addEventListener('mousemove', onMouseMove, false);
     canvas.addEventListener('click', onMouseClick, false);
@@ -191,14 +190,15 @@ function init() {
     requestAnimationFrame(main);
 }
 
+// 敵を追加していく
 setInterval(function() {
     let min_x = 0;
     let min_y = 0;
-    let max_x = canvas.width;
-    let max_y = canvas.height;
+    let max_x = field.context.canvas.width;
+    let max_y = field.context.canvas.height;
     let x = Math.floor(Math.random() * (max_x - min_x + 1) + min_x)
     let y = Math.floor(Math.random() * (max_y - min_y + 1) + min_y)
-    field.appendChild(new Enemy(context, x, y));
+    field.appendChild(new Enemy(field.context, x, y));
 }, 3000)
 
 
