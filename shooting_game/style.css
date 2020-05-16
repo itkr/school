@@ -1,3 +1,9 @@
-canvas {
+body {
+    background-color: #cccccc;
+    text-align: center;
+}
+canvas#shooting_game {
+    margin: 1em;
     border: 1px solid #000000;
+    background-color: #ffffff;
 }
