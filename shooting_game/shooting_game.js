@@ -70,9 +70,7 @@ class Shot extends Obj {
     makeObject() {
         drawCircle(this.context, this.x, this.y, 5, 'rgb(0, 0, 255)');
     }
-    preDraw() {
-        let collisions = this.moveTo(null, this.y - 15);
-        // 敵にぶつかったら消す
+    controllCollisions(collisions){
         for (let collision of collisions) {
             if (collision instanceof Enemy) {
                 collision.disable();
@@ -81,6 +79,11 @@ class Shot extends Obj {
                 break;
             }
         }
+    }
+    preDraw() {
+        let collisions = this.moveTo(null, this.y - 15);
+        // 敵にぶつかったら消す
+        this.controllCollisions(collisions);
         // フィールドから出たら無効にする
         if (this.y < 0 || this.x < 0 || this.context.width < this.x || this.height < this.y) {
             this.disable();
@@ -101,14 +104,19 @@ class Machine extends Obj {
 }
 
 class Enemy extends Obj {
+    constructor(context, x=0, y=0, move=null) {
+        super(context, x, y);
+        this.move = move !== null ? move: this.defaultMove;
+    }
+    defaultMove(x, y) {
+        let _x = x + Math.random() * 10 - Math.random() * 10
+        let _y = y + Math.random() * 5 - Math.random() * 5
+        return [_x, _y]
+    }
     makeObject() {
         drawRect(this.context, this.x, this.y, 20, 20, 'rgb(0, 0, 0)');
     }
-    preDraw() {
-        let collisions = this.moveTo(
-            this.x + Math.random() * 10 - Math.random() * 10,
-            this.y + Math.random() * 5 - Math.random() * 5
-        );
+    controllCollisions(collisions) {
         for (let collision of collisions) {
             if (collision instanceof Machine) {
                 collision.disable();
@@ -118,14 +126,18 @@ class Enemy extends Obj {
             }
         }
     }
+    preDraw() {
+        let point = this.move(this.x, this.y)
+        let collisions = this.moveTo(point[0], point[1]);
+        this.controllCollisions(collisions);
+    }
 }
 
 class Bomb extends Obj {
     makeObject() {
         drawCircle(this.context, this.x, this.y, 10, 'rgb(255, 255, 255)', 'rgb(0, 0, 0)');
     }
-    preDraw() {
-        let collisions = this.moveTo(this.x, this.y + 4);
+    controllCollisions(collisions) {
         for (let collision of collisions) {
             if (collision instanceof Machine) {
                 this.disable();
@@ -138,6 +150,10 @@ class Bomb extends Obj {
                 break;
             }
         }
+    }
+    preDraw() {
+        let collisions = this.moveTo(this.x, this.y + 4);
+        this.controllCollisions(collisions);
         if (this.y < 0 || this.x < 0 || this.context.width < this.x || this.height < this.y) {
             this.disable();
         }
@@ -197,28 +213,27 @@ function main() {
     requestAnimationFrame(main);
 }
 
-// 敵を追加していく
-setInterval(function() {
-    if (machine === null) {
-        return;
-    }
-    let min_x = 0;
-    let min_y = 0;
-    let max_x = field.context.canvas.width;
-    let max_y = field.context.canvas.height;
-    let x = Math.floor(Math.random() * (max_x - min_x + 1) + min_x)
-    let y = Math.floor(Math.random() * (max_y - min_y + 1) + min_y)
-    field.appendChild(new Enemy(field.context, x, y));
-}, 300)
+function randint(from, to) {
+    return Math.floor(Math.random() * (to - from + 1) + from)
+}
 
 // 敵を追加していく
-setInterval(function() {
+let wave1 = function() {
     if (machine === null) {
         return;
     }
-    let min_x = 0;
-    let max_x = field.context.canvas.width;
-    let x = Math.floor(Math.random() * (max_x - min_x + 1) + min_x)
+    let x = randint(0, field.context.canvas.width)
+    let y = randint(0, field.context.canvas.height)
+    let move = function(x, y){
+        return [x + 2, y + 2];
+    }
+    field.appendChild(new Enemy(field.context, x, y, move));
+    field.appendChild(new Enemy(field.context, x, y));
+}
+
+// Bombを追加していく
+setInterval(function() {
+    let x = randint(0, field.context.canvas.width);
     field.appendChild(new Bomb(field.context, x, 0));
 }, 5000)
 
@@ -240,6 +255,10 @@ function init() {
     machine = new Machine(context, 10, 10);
     field.appendChild(machine);
     // 敵設置
+    let wave = setInterval(wave1, 600);
+    // setInterval(function(){
+        // clearInterval(wave);
+    // }, 6000)
     // ゲーム開始
     requestAnimationFrame(main);
 }
