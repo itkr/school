@@ -209,6 +209,7 @@ function onMouseClick(e) {
 // メインループ
 function main() {
     field.draw();
+    field.context.fillStyle = 'rgb(0, 0, 0)';
     field.context.fillText('score: ' + score, 10, 20)
     requestAnimationFrame(main);
 }
