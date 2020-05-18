@@ -226,17 +226,34 @@ let wave1 = function() {
     let x = randint(0, field.context.canvas.width)
     let y = randint(0, field.context.canvas.height)
     let move = function(x, y){
-        return [x + 2, y + 2];
+        return [x - randint(1, 5), y - randint(1, 5)];
     }
-    field.appendChild(new Enemy(field.context, x, y, move));
+    field.appendChild(new Enemy(field.context, field.context.canvas.width, y, move));
+    field.appendChild(new Enemy(field.context, x, field.context.canvas.height, move));
+}
+
+let wave2 = function() {
+    if (machine === null) {
+        return;
+    }
+    let x = randint(0, field.context.canvas.width)
+    let y = randint(0, field.context.canvas.height)
     field.appendChild(new Enemy(field.context, x, y));
 }
 
-// Bombを追加していく
-setInterval(function() {
-    let x = randint(0, field.context.canvas.width);
-    field.appendChild(new Bomb(field.context, x, 0));
-}, 5000)
+function waveChain() {
+    let waves = [wave1, wave2];
+    let wave = setInterval(waves[0], 300);
+    let index = 0;
+    setInterval(function(){
+        clearInterval(wave);
+        index++;
+        if (waves.length === index) {
+            index = 0;
+        }
+        wave = setInterval(waves[index], 300);
+    }, 3000)
+}
 
 // 初期化
 function init() {
@@ -247,19 +264,27 @@ function init() {
         return;
     }
     let context = canvas.getContext('2d');
+
     // イベント設定
     canvas.addEventListener('mousemove', onMouseMove, false);
     canvas.addEventListener('click', onMouseClick, false);
+
     // フィールド設置
     field = new Field(context);
+
     // 自機設置
     machine = new Machine(context, 10, 10);
     field.appendChild(machine);
+
     // 敵設置
-    let wave = setInterval(wave1, 600);
-    // setInterval(function(){
-        // clearInterval(wave);
-    // }, 6000)
+    waveChain();
+
+    // Bomb設置
+    setInterval(function() {
+        let x = randint(0, field.context.canvas.width);
+        field.appendChild(new Bomb(field.context, x, 0));
+    }, 5000)
+
     // ゲーム開始
     requestAnimationFrame(main);
 }
