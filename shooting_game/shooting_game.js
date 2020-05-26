@@ -220,9 +220,6 @@ function randint(from, to) {
 
 // 敵を追加していく
 let wave1 = function() {
-    if (machine === null) {
-        return;
-    }
     let x = randint(0, field.context.canvas.width)
     let y = randint(0, field.context.canvas.height)
     let move = function(x, y){
@@ -233,9 +230,6 @@ let wave1 = function() {
 }
 
 let wave2 = function() {
-    if (machine === null) {
-        return;
-    }
     let x = randint(0, field.context.canvas.width)
     let y = randint(0, field.context.canvas.height)
     field.appendChild(new Enemy(field.context, x, y));
@@ -245,11 +239,18 @@ function setWaveChain(waves) {
     let wave = setInterval(waves[0], 300);
     let index = 0;
     setInterval(function(){
+        // 前回のWaveを削除
         clearInterval(wave);
+        // Machineが倒れていたら次のWaveは追加しない
+        if (machine === null) {
+            return;
+        }
+        // Waveをループさせるようにインデックスを更新
         index++;
         if (waves.length === index) {
             index = 0;
         }
+        // 次のWaveをセット
         wave = setInterval(waves[index], 300);
     }, 3000)
 }
