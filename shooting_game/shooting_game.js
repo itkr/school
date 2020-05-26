@@ -241,8 +241,7 @@ let wave2 = function() {
     field.appendChild(new Enemy(field.context, x, y));
 }
 
-function waveChain() {
-    let waves = [wave1, wave2];
+function setWaveChain(waves) {
     let wave = setInterval(waves[0], 300);
     let index = 0;
     setInterval(function(){
@@ -277,7 +276,7 @@ function init() {
     field.appendChild(machine);
 
     // 敵設置
-    waveChain();
+    setWaveChain([wave1, wave2]);
 
     // Bomb設置
     setInterval(function() {
