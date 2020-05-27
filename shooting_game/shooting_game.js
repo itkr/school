@@ -1,8 +1,10 @@
-// グローバル変数
-// TODO: gameオブジェクトを作る
 // TODO: JSON読み込み
 // TODO: API呼び出し
-// TODO: 最高点など記録(session storage)
+
+// 定数
+const MAX_SCORE_KEY = 'max_score';
+
+// グローバル変数
 let mouseX = 0;
 let mouseY = 0;
 
@@ -10,6 +12,7 @@ let field = null;
 let machine = null;
 
 let score = 0;
+let maxScore = sessionStorage.getItem(MAX_SCORE_KEY);
 
 
 class Obj {
@@ -122,6 +125,7 @@ class Enemy extends Obj {
                 collision.disable();
                 this.disable();
                 machine = null;
+                updateMaxScore(score);
                 break;
             }
         }
@@ -217,6 +221,7 @@ function main() {
     field.draw();
     field.context.fillStyle = 'rgb(0, 0, 0)';
     field.context.fillText('score: ' + score, 10, 20)
+    field.context.fillText('max score: ' + Math.max(score, maxScore), 10, 40)
     requestAnimationFrame(main);
 }
 
@@ -283,6 +288,14 @@ function setWaveChain(waves) {
         wave = waves[index];
         wave.enter();
     }, 3000)
+}
+
+function updateMaxScore(newScore) {
+    let score = sessionStorage.getItem(MAX_SCORE_KEY);
+    if (score < newScore) {
+        sessionStorage.setItem(MAX_SCORE_KEY, newScore);
+    }
+
 }
 
 // 初期化
