@@ -133,6 +133,12 @@ class Enemy extends Obj {
     }
 }
 
+class LinerEnemy extends Enemy {
+    defaultMove(x, y){
+        return [x - randint(1, 5), y - randint(1, 5)];
+    }
+}
+
 class Bomb extends Obj {
     makeObject() {
         drawCircle(this.context, this.x, this.y, 10, 'rgb(255, 255, 255)', 'rgb(0, 0, 0)');
@@ -222,45 +228,45 @@ class Wave {
     constructor(field, time=3000) {
         this.field = field;
         this.time = time;
-        this.wave = null;
     }
+    enter() {}
+    exit() {}
+}
+
+class Wave1 extends Wave {
+    enter() {
+        let count = 10;
+        let stance = this.field.context.canvas.width / count;
+        let y = 0;
+        for (let i=0; i<count; i++) {
+            y = randint(10, this.field.context.canvas.height);
+            this.field.appendChild(new Enemy(this.field.context, stance * i, y));
+        }
+    }
+}
+
+class Wave2 extends Wave {
     enter() {
         let that = this;
         this.wave = setInterval(function(){
             that.action(that.field.context);
         }, 300);
     }
-    action() {}
+    action() {
+        let x = randint(0, this.field.context.canvas.width)
+        let y = randint(0, this.field.context.canvas.height)
+        this.field.appendChild(new LinerEnemy(this.field.context, this.field.context.canvas.width, y));
+        this.field.appendChild(new LinerEnemy(this.field.context, x, this.field.context.canvas.height));
+    }
     exit() {
         clearInterval(this.wave);
     }
 }
 
-class Wave1 extends Wave {
-    action() {
-        console.log('wave1')
-        let x = randint(0, this.field.context.canvas.width)
-        let y = randint(0, this.field.context.canvas.height)
-        this.field.appendChild(new Enemy(this.field.context, x, y));
-    }
-}
-
-class Wave2 extends Wave {
-    action() {
-        console.log('wave2')
-        let x = randint(0, this.field.context.canvas.width)
-        let y = randint(0, this.field.context.canvas.height)
-        let move = function(x, y){
-            return [x - randint(1, 5), y - randint(1, 5)];
-        }
-        this.field.appendChild(new Enemy(this.field.context, this.field.context.canvas.width, y, move));
-        this.field.appendChild(new Enemy(this.field.context, x, this.field.context.canvas.height, move));
-    }
-}
-
 function setWaveChain(waves) {
     let index = 0;
-    let wave = waves[0];
+    let wave = waves[index];
+    wave.enter();
     setInterval(function(){
         // 前回のWaveを削除
         wave.exit();
@@ -278,43 +284,6 @@ function setWaveChain(waves) {
         wave.enter();
     }, 3000)
 }
-
-// 敵を追加していく
-// let wave1 = function() {
-//     let x = randint(0, field.context.canvas.width)
-//     let y = randint(0, field.context.canvas.height)
-//     let move = function(x, y){
-//         return [x - randint(1, 5), y - randint(1, 5)];
-//     }
-//     field.appendChild(new Enemy(field.context, field.context.canvas.width, y, move));
-//     field.appendChild(new Enemy(field.context, x, field.context.canvas.height, move));
-// }
-
-// let wave2 = function() {
-//     let x = randint(0, field.context.canvas.width)
-//     let y = randint(0, field.context.canvas.height)
-//     field.appendChild(new Enemy(field.context, x, y));
-// }
-
-// function setWaveChain(waves) {
-//     let wave = setInterval(waves[0], 300);
-//     let index = 0;
-//     setInterval(function(){
-//         // 前回のWaveを削除
-//         clearInterval(wave);
-//         // Machineが倒れていたら次のWaveは追加しない
-//         if (machine === null) {
-//             return;
-//         }
-//         // Waveをループさせるようにインデックスを更新
-//         index++;
-//         if (waves.length === index) {
-//             index = 0;
-//         }
-//         // 次のWaveをセット
-//         wave = setInterval(waves[index], 300);
-//     }, 3000)
-// }
 
 // 初期化
 function init() {
@@ -338,7 +307,6 @@ function init() {
     field.appendChild(machine);
 
     // 敵設置
-    // setWaveChain([wave1, wave2]);
     setWaveChain([new Wave1(field), new Wave2(field)]);
 
     // Bomb設置
