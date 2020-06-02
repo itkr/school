@@ -16,10 +16,12 @@ let maxScore = sessionStorage.getItem(MAX_SCORE_KEY);
 
 
 class Obj {
-    constructor(context, x=0, y=0) {
+    constructor(context, x=0, y=0, w=10, h=10) {
         this.context = context;
         this.x = x;
         this.y = y;
+        this.w = w;
+        this.h = h;
         this.children = [];
         this.enabled = true;
     }
@@ -30,10 +32,10 @@ class Obj {
         // 与えられたポイントがこのオブジェクト内に入っているか
         // TODO: 数学とか使う
         // TODO: 大きさを可変に
-        if (this.x + 10 < x || x < this.x - 10) {
+        if (this.x + this.w < x || x < this.x - this.w) {
             return false;
         }
-        if (this.y + 10 < y || y < this.y - 10) {
+        if (this.y + this.h < y || y < this.y - this.h) {
             return false;
         }
         return true;
@@ -71,7 +73,7 @@ class Obj {
 
 class Shot extends Obj {
     makeObject() {
-        drawCircle(this.context, this.x, this.y, 5, 'rgb(0, 0, 255)');
+        drawCircle(this.context, this.x, this.y, this.w / 2, 'rgb(0, 0, 255)');
     }
     controllCollisions(collisions){
         for (let collision of collisions) {
@@ -96,7 +98,7 @@ class Shot extends Obj {
 
 class Machine extends Obj {
     makeObject() {
-        drawTriangle(this.context, this.x, this.y, 30, 'rgb(255, 0, 0)')
+        drawTriangle(this.context, this.x, this.y, this.w, 'rgb(255, 0, 0)')
     }
     preDraw() {
         this.moveTo(mouseX, mouseY);
@@ -107,7 +109,7 @@ class Machine extends Obj {
 }
 
 class Enemy extends Obj {
-    constructor(context, x=0, y=0, move=null) {
+    constructor(context, x=0, y=0, w=10, h=10, move=null) {
         super(context, x, y);
         this.move = move !== null ? move: this.defaultMove;
     }
@@ -145,7 +147,7 @@ class LinerEnemy extends Enemy {
 
 class Bomb extends Obj {
     makeObject() {
-        drawCircle(this.context, this.x, this.y, 10, 'rgb(255, 255, 255)', 'rgb(0, 0, 0)');
+        drawCircle(this.context, this.x, this.y, this.w, 'rgb(255, 255, 255)', 'rgb(0, 0, 0)');
     }
     controllCollisions(collisions) {
         for (let collision of collisions) {
@@ -316,7 +318,7 @@ function init() {
     field = new Field(context);
 
     // 自機設置
-    machine = new Machine(context, 10, 10);
+    machine = new Machine(context, 10, 10, 30);
     field.appendChild(machine);
 
     // 敵設置
